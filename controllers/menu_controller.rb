@@ -56,11 +56,11 @@ class MenuController
             # displays submenu for each entry
             entry_submenu(entry)
         end
-        
+
         system "clear"
         puts "End of entries"
     end
-    
+
     def create_entry
         #clear screen before displaying the create entry prompts
         system "clear"
@@ -72,35 +72,68 @@ class MenuController
         phone = gets.chomp
         print "Email: "
         email = gets.chomp
-        
+
         #add new entry to addres book using add_entry, which indexes entry in lexographical order
         @address_book.add_entry(name, phone, email)
-        
+
         system "clear"
         puts "New entry created"
     end
-    
+
     def search_entries
+      print "Search by name: "
+      name = gets.chomp
+      match = @address_book.binary_search(name)
+      system "clear"
+#if match, prints entry.
+#if no match, nil is returned from search and no match msg is printed
+      if match
+        puts match.to_s
+        search_submenu(match)
+      else
+        puts "No match found for #{name}"
+      end
     end
-    
+
     def read_csv
+      print "Enter CSV file to import: "
+      file_name = gets.chomp
+
+      if file_name.empty?
+        system "clear"
+        puts "No CSV file read"
+        main_menu
+      end
+#begin protects the program from crashing if an exception is thrown.
+      begin
+        entry_count = @address_book.import_from_csv(file_name).count
+        system "clear"
+        puts "#{entry_count} new entries added from #{file_name}."
+#program picks up here if exception is thrown
+      rescue
+        puts "#{file_name} is not a valid CSV file. Please enter the name of a valid CSV file."
+        read_csv
+      end
     end
-    
+
     def entry_submenu(entry)
         #display submenu options
-        puts "n - next entry"
+        puts "\nn - next entry"
         puts "d - delete entry"
         puts "e - edit this entry"
         puts "m - return to main menu"
-        
+
         #chomp removes whitespace
         selection = gets.chomp
-        
+
         case selection
             #when the user asks to see the next entry, we can do nothing and control will be returned to view_all_entries
             when "n"
             when "d"
+              delete_entry(entry)
             when "e"
+              edit_entry(entry)
+              entry_submenu(entry)
             when "m"
                 system "clear"
                 main_menu
@@ -110,4 +143,52 @@ class MenuController
             entry_submenu(entry)
             end
         end
+
+      def delete_entry(entry)
+          @address_book.entries.delete(entry)
+          puts "#{entry.name} has been deleted"
+      end
+
+      def edit_entry(entry)
+
+        print "Updated name: "
+        name = gets.chomp
+        print "Updated phone number: "
+        phone_number = gets.chomp
+        print "Updated email: "
+        email = gets.chomp
+
+        entry.name = name if !name.empty?
+        entry.phone_number = phone_number if !phone_number.empty?
+        entry.email = email if !email.empty?
+        system "clear"
+
+        puts "Updated entry:"
+        puts entry
+      end
+
+    def search_submenu(entry)
+        puts "\nd - delete entry"
+        puts "e - edit this entry"
+        puts "m - return to main menu"
+        selection = gets.chomp
+    case selection
+      when "d"
+        system "clear"
+        delete_entry(entry)
+        main_menu
+      when "e"
+        edit_entry(entry)
+        system "clear"
+        main_menu
+      when "m"
+        system "clear"
+        main_menu
+      else
+        system "clear"
+        puts "#{selection} is not a valid input"
+        puts entry.to_s
+        search_submenu(entry)
+      end
+    end
 end
