@@ -1,7 +1,7 @@
 require_relative '../models/address_book'
 
 RSpec.describe AddressBook do
-    #lets us use book in all tests for AddressBook.new
+    #Allows use of book in all tests for AddressBook.new
     let(:book) { AddressBook.new }
 
     def check_entry(entry, expected_name, expected_number, expected_email)
@@ -42,10 +42,8 @@ RSpec.describe AddressBook do
     end
 
     #Test that AddressBook's .import_from_csv() method is working as expected
-    #by seeing if it imports the correct number of entries
     describe "#import_from_csv" do
-        it "imports the correct number of entries" do
-            #call import_from_csv method on new AddressBook 'book' with entries.csv as a string parameter.
+        it "tests the csv import process" do
             book.import_from_csv("entries.csv")
             book_size = book.entries.size
             expect(book_size).to eq 5
@@ -80,5 +78,33 @@ RSpec.describe AddressBook do
           entry_five = book.entries[4]
           check_entry(entry_five, "Sussie", "555-555-2036", "sussie@blocmail.com")
         end
+      end
+
+    describe "import entries from entries_2.csv" do
+        it "tests the csv import process" do
+          book.import_from_csv("entries_2.csv")
+          book_size = book.entries.size
+          expect(book_size).to eq 3
+        end
+
+        it "imports 1st entry from entries_2.csv" do
+          book.import_from_csv("entries_2.csv")
+          entry_1 = book.entries[0]
+          check_entry(entry_1, "April", "555-555-1236", "april@pawnee.gov")
+        end
+
+        it "imports 2nd entry from entries_2.csv" do
+          book.import_from_csv("entries_2.csv")
+          entry_2 = book.entries[1]
+          check_entry(entry_2, "Leslie", "555-555-1234", "leslie@pawnee.gov")
+        end
+
+        it "imports 3rd entry from entries_2.csv" do
+          book.import_from_csv("entries_2.csv")
+          entry_3 = book.entries[2]
+          check_entry(entry_3, "Tom", "555-555-1235", "tom@pawnee.gov")
+        end
+
+
     end
 end
